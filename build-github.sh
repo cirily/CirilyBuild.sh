@@ -1,359 +1,138 @@
 #!/bin/bash
 #case select test for
-echo '欢迎使用CutefishDE自动编译脚本, 本脚本适用于大部分Debian/Ubuntu发行版, 旨在让更多Linux使用可爱鱼.'
-echo '若编译出现错误可根据官方GitHub自行修改脚本内容再次编译, 官方Github: https://github.com/cutefishos/ .'
-echo '原作者Moore本墨, Github: https://github.com/Moore2253/CutefishOSBuild.sh'
-echo '增加了一次编译所有库的功能, 修改者wujunyi'
-echo '提示: 请输入项目前序号并回车以开始编译, 输入25(quit)退出'
+echo '    Welcome to PiscesDE build script! This script works on most Debian/Ubuntu-based distros and aims at making PiscesDE usable on other Linux distros.'
+echo '    This script can build and install one component / all of the components of PiscesDE automatically based on your choice.'
+echo '    By default, all of the git repositories will be cloned to ~/piscesys from https://github.com/piscesys . You can change them by simply modifing $REPO_PATH and $GIT_REPO_URL.'
+echo '    In case of errors, you can report them to https://github.com/piscesys/PiscesDEBuild.sh/issues .'
+echo '------'
+echo 'Authors: Moore2253:     Original author'
+echo '         wujunyi:       Co-author'
+echo '         TsukuyomiToki: Co-author and English translation'
+echo '------'
+echo 'You should read all the above before starting to build.'
 
-PS3='请选择你要编译的项目, 27为退出: '
-echo $PS3
-echo '检测~/目录下是否存在是否已经存在cutefishos文件夹'
-if test -e ~/cutefishos 
-then
-  echo '检测到同名文件夹, 正在删除'
-  sudo rm -rf ~/cutefishos
-  echo '删除完毕, 重新创建文件夹, 继续编译'
-  mkdir ~/cutefishos
-else
-  echo "无同名文件夹, 继续编译"
-  mkdir ~/cutefishos
-fi
+echo "The next step will install necessary dependencies for building."
+read -r -p "Continue? [Y/n] " input
+case $input in
+    [yY][eE][sS]|[yY])
+        echo "------"
+		;;
+    *)
+		echo "Quitting."
+		exit 1
+		;;
+esac
 
-echo '开始安装依赖'
-sudo apt install libpolkit-qt5-1-dev qml-module-qtquick-dialogs libxcb-damage0-dev libicu-dev libqapt-dev libkf5solid-dev pkg-config extra-cmake-modules libpam0g-dev libxcb-util-dev lintian libsm-dev libkf5screen-dev libxcb-composite0-dev qml-module-qt-labs-settings libqt5sensors5-dev libcanberra-dev qml-module-qtqml debhelper libfreetype6-dev libkf5bluezqt-dev qml-module-qtquick-shapes libapt-pkg-dev xserver-xorg-dev qtbase5-dev libx11-dev libcrypt-dev libfontconfig1-dev cmake qml-module-qtquick-particles2 libxcb1-dev xserver-xorg-input-synaptics-dev libkf5idletime-dev libkf5networkmanagerqt-dev automake libqt5x11extras5-dev git libxcb-dri2-0-dev qml-module-qtquick2 libxcursor-dev qttools5-dev qml-module-qtquick-layouts libcanberra-pulse libxcb-keysyms1-dev libsystemd-dev gcc -y libxcb-glx0-dev qttools5-dev-tools qml-module-qtquick-window2 libxcb-image0-dev libcap-dev libpulse-dev libxcb-randr0-dev qml-module-qtquick-controls2 libxcb-shm0-dev libxcb-ewmh-dev equivs libxcb-icccm4-dev qtdeclarative5-dev libkf5kio-dev qtquickcontrols2-5-dev libkf5coreaddons-dev devscripts libxcb-xfixes0-dev libxcb-record0-dev qml-module-qt-labs-platform libxtst-dev libxcb-dpms0-dev build-essential libkf5windowsystem-dev xserver-xorg-input-libinput-dev autotools-dev libx11-xcb-dev libxcb-dri3-dev qml-module-org-kde-kwindowsystem libkf5globalaccel-dev qtbase5-private-dev modemmanager-qt-dev libpolkit-agent-1-dev curl libxcb-shape0-dev --no-install-recommends -y
+# Set repository path & URL here.
+# Please mind that NO SPLASH ("/") should appear at the end of the path.
+REPO_PATH=~/piscesys
+GIT_REPO_URL=https://github.com/piscesys
 
-function Compile(){
-    case $1 in 
-        filemanager)
-        echo '开始编译filemanager'
-        cd ~/cutefishos
-        echo '正在克隆项目'
-        git clone https://github.com/piscesys/filemanager.git
-        echo '正在编译'
-        cd ~/cutefishos/filemanager
+mkdir $REPO_PATH
+
+echo 'Installing dependencies:'
+#sudo apt install libpolkit-qt5-1-dev qml-module-qtquick-dialogs libxcb-damage0-dev libicu-dev libqapt-dev libkf5solid-dev pkg-config extra-cmake-modules libpam0g-dev libxcb-util-dev lintian libsm-dev libkf5screen-dev libxcb-composite0-dev qml-module-qt-labs-settings libqt5sensors5-dev libcanberra-dev qml-module-qtqml debhelper libfreetype6-dev libkf5bluezqt-dev qml-module-qtquick-shapes libapt-pkg-dev xserver-xorg-dev qtbase5-dev libx11-dev libcrypt-dev libfontconfig1-dev cmake qml-module-qtquick-particles2 libxcb1-dev xserver-xorg-input-synaptics-dev libkf5idletime-dev libkf5networkmanagerqt-dev automake libqt5x11extras5-dev git libxcb-dri2-0-dev qml-module-qtquick2 libxcursor-dev qttools5-dev qml-module-qtquick-layouts libcanberra-pulse libxcb-keysyms1-dev libsystemd-dev gcc -y libxcb-glx0-dev qttools5-dev-tools qml-module-qtquick-window2 libxcb-image0-dev libcap-dev libpulse-dev libxcb-randr0-dev qml-module-qtquick-controls2 libxcb-shm0-dev libxcb-ewmh-dev equivs libxcb-icccm4-dev qtdeclarative5-dev libkf5kio-dev qtquickcontrols2-5-dev libkf5coreaddons-dev devscripts libxcb-xfixes0-dev libxcb-record0-dev qml-module-qt-labs-platform libxtst-dev libxcb-dpms0-dev build-essential libkf5windowsystem-dev xserver-xorg-input-libinput-dev autotools-dev libx11-xcb-dev libxcb-dri3-dev qml-module-org-kde-kwindowsystem libkf5globalaccel-dev qtbase5-private-dev modemmanager-qt-dev libpolkit-agent-1-dev curl libxcb-shape0-dev --no-install-recommends -y
+echo 'Dependencies installed.'
+echo '------'
+
+function standardBuild_apt(){
+    echo "$1 build start:"
+        cd "$REPO_PATH"
+        echo "Cloning:"
+        git clone "$GIT_REPO_URL/$1.git"
+        cd $1
+        echo "Installing the dependencies:"
         sudo mk-build-deps ./debian/control -i -t "apt-get --yes" -r
+        echo "Building:"
         dpkg-buildpackage -b -uc -us
+    echo "$1 built"
+
+    echo "$1 installation start:"
+        sudo apt-get install $REPO_PATH/$1_*.deb
+        # This step is able to prevent installing dbgsym for its name being xxx-dbgsym_v.e.r_architect.deb .
+    echo "$1 installed."
+    echo '------'
+}
+
+function standardBuild_make(){
+    echo "$1 build start:"
+        cd "$REPO_PATH"
+        echo "Cloning:"
+        git clone "$GIT_REPO_URL/$1.git"
+        cd $1
+        echo "Installing the dependencies:"
+        sudo mk-build-deps ./debian/control -i -t "apt-get --yes" -r
+        echo "Building:"
         mkdir build
         cd build
         cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ..
         make
-        echo '编译完成, 正在安装'
+    echo "$1 built."
+
+    echo "$1 installation start:"
         sudo make install
-        echo 'filemanager安装完成'
+    echo "$1 installed."
+    echo '------'
+}
+
+WAY_TO_INSTALL=""
+
+function Build(){
+    case $WAY_TO_INSTALL in 
+        apt)
+            standardBuild_apt $1
         ;;
-        dock)
-        echo '开始编译dock'
-        cd ~/cutefishos
-        echo '正在克隆项目'
-        git clone https://github.com/piscesys/dock.git
-        echo '正在编译'
-        cd ~/cutefishos/dock
-        sudo mk-build-deps ./debian/control -i -t "apt-get --yes" -r
-        dpkg-buildpackage -b -uc -us
-        mkdir build
-        cd build
-        cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ..
-        make
-        echo '编译完成, 正在安装'
-        sudo make install
-        echo 'dock安装完成'
-        ;;
-        fishui)
-        cd ~/cutefishos
-        git clone https://github.com/piscesys/fishui.git
-        cd ~/cutefishos/fishui
-        sudo mk-build-deps ./debian/control -i -t "apt-get --yes" -r
-        dpkg-buildpackage -b -uc -us
-        mkdir build
-        cd build
-        cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ..
-        make
-        sudo make install
-        ;;
-        screenshot)
-        cd ~/cutefishos
-        git clone https://github.com/piscesys/screenshot.git
-        cd ~/cutefishos/screenshot
-        sudo mk-build-deps ./debian/control -i -t "apt-get --yes" -r
-        dpkg-buildpackage -b -uc -us
-        mkdir build
-        cd build
-        cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ..
-        make
-        sudo make install
-        ;;
-        qt-plugins)
-        cd ~/cutefishos
-        git clone https://github.com/piscesys/qt-plugins.git
-        cd ~/cutefishos/qt-plugins
-        sudo mk-build-deps ./debian/control -i -t "apt-get --yes" -r
-        dpkg-buildpackage -b -uc -us
-        mkdir build
-        cd build
-        cmake ..
-        make
-        sudo make install
-        ;;
-        terminal)
-        cd ~/cutefishos
-        git clone https://github.com/piscesys/terminal.git
-        cd ~/cutefishos/terminal
-        sudo mk-build-deps ./debian/control -i -t "apt-get --yes" -r
-        dpkg-buildpackage -b -uc -us
-        mkdir build
-        cd build
-        cmake ..
-        make
-        sudo make install
-        ;;
-        launcher)
-        cd ~/cutefishos
-        git clone https://github.com/piscesys/launcher.git
-        cd ~/cutefishos/launcher
-        sudo mk-build-deps ./debian/control -i -t "apt-get --yes" -r
-        dpkg-buildpackage -b -uc -us
-        mkdir build
-        cd build
-        cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ..
-        make
-        sudo make install
-        ;;
-        settings)
-        cd ~/cutefishos
-        git clone https://github.com/piscesys/settings.git
-        cd ~/cutefishos/settings
-        sudo mk-build-deps ./debian/control -i -t "apt-get --yes" -r
-        dpkg-buildpackage -b -uc -us
-        mkdir build
-        cd build
-        cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ..
-        make
-        sudo make install
-        ;;
-        debinstaller)
-        cd ~/cutefishos
-        git clone https://github.com/piscesys/debinstaller.git
-        cd ~/cutefishos/debinstaller
-        sudo mk-build-deps ./debian/control -i -t "apt-get --yes" -r
-        dpkg-buildpackage -b -uc -us
-        mkdir build
-        cd build
-        cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ..
-        make
-        sudo make install
-        ;;
-        icons)
-        cd ~/cutefishos
-        git clone https://github.com/piscesys/icons.git
-        cd ~/cutefishos/icons
-        sudo mk-build-deps ./debian/control -i -t "apt-get --yes" -r
-        dpkg-buildpackage -b -uc -us
-        mkdir build
-        cd build
-        cmake  ..
-        make
-        sudo make install
-        ;;
-        gtk-themes)
-        cd ~/cutefishos
-        git clone https://github.com/piscesys/gtk-themes.git
-        cd ~/cutefishos/gtk-themes
-        sudo mk-build-deps ./debian/control -i -t "apt-get --yes" -r
-        dpkg-buildpackage -b -uc -us
-        mkdir build
-        cd build
-        cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ..
-        make
-        sudo make install
-        ;;
-        daemon)
-        cd ~/cutefishos
-        git clone https://github.com/piscesys/daemon.git
-        cd ~/cutefishos/daemon
-        sudo mk-build-deps ./debian/control -i -t "apt-get --yes" -r
-        dpkg-buildpackage -b -uc -us
-        mkdir build
-        cd build
-        cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ..
-        make
-        sudo make install
-        ;;
-        statusbar)
-        cd ~/cutefishos
-        git clone https://github.com/piscesys/statusbar.git
-        cd ~/cutefishos/statusbar
-        sudo mk-build-deps ./debian/control -i -t "apt-get --yes" -r
-        dpkg-buildpackage -b -uc -us
-        mkdir build
-        cd build
-        cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ..
-        make
-        sudo make install
-        ;;
-        libcutefish)
-        cd ~/cutefishos
-        git clone https://github.com/piscesys/libcutefish.git
-        cd ~/cutefishos/libcutefish
-        sudo mk-build-deps ./debian/control -i -t "apt-get --yes" -r
-        dpkg-buildpackage -b -uc -us
-        mkdir build
-        cd build
-        cmake ..
-        make
-        sudo make install
-        ;;
-        core)
-        cd ~/cutefishos
-        git clone https://github.com/piscesys/core.git
-        cd ~/cutefishos/core
-        sudo mk-build-deps ./debian/control -i -t "apt-get --yes" -r
-        dpkg-buildpackage -b -uc -us
-        mkdir build
-        cd build
-        cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ..
-        make
-        sudo make install
-        ;;
-        updator)
-        cd ~/cutefishos
-        git clone https://github.com/piscesys/updator.git
-        cd ~/cutefishos/updator
-        sudo mk-build-deps ./debian/control -i -t "apt-get --yes" -r
-        dpkg-buildpackage -b -uc -us
-        mkdir build
-        cd build
-        cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ..
-        make
-        sudo make install
-        ;;
-        screenlocker)
-        cd ~/cutefishos
-        git clone https://github.com/piscesys/screenlocker.git
-        cd ~/cutefishos/screenlocker
-        sudo mk-build-deps ./debian/control -i -t "apt-get --yes" -r
-        dpkg-buildpackage -b -uc -us
-        mkdir build
-        cd build
-        cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ..
-        make
-        sudo make install
-        ;;
-        texteditor)
-        cd ~/cutefishos
-        sudo mk-build-deps -i -t "apt-get --yes" -r
-        git clone https://github.com/piscesys/texteditor.git
-        cd ~/cutefishos/texteditor
-        sudo mk-build-deps ./debian/control -i -t "apt-get --yes" -r
-        dpkg-buildpackage -b -uc -us
-        mkdir build
-        cd build
-        cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ..
-        make
-        sudo make install
-        ;;
-        calculator)
-        cd ~/cutefishos
-        git clone https://github.com/piscesys/calculator.git
-        cd ~/cutefishos/calculator
-        sudo mk-build-deps ./debian/control -i -t "apt-get --yes" -r
-        dpkg-buildpackage -b -uc -us
-        mkdir build
-        cd build
-        cmake ..
-        make
-        sudo make install
-        ;;
-        kwin-plugins)
-        cd ~/cutefishos
-        git clone https://github.com/piscesys/kwin-plugins.git
-        cd ~/cutefishos/kwin-plugins
-        sudo mk-build-deps ./debian/control -i -t "apt-get --yes" -r
-        dpkg-buildpackage -b -uc -us
-        mkdir build
-        cd build
-        cmake ..
-        make
-        sudo make install
-        ;;
-        videoplayer)
-        cd ~/cutefishos
-        git clone https://github.com/piscesys/videoplayer.git
-        cd ~/cutefishos/videoplayer
-        sudo mk-build-deps ./debian/control -i -t "apt-get --yes" -r
-        dpkg-buildpackage -b -uc -us
-        mkdir build
-        cd build
-        cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ..
-        make
-        sudo make install
-        ;;
-        sddm-theme)
-        cd ~/cutefishos
-        git clone https://github.com/piscesys/sddm-theme.git
-        cd ~/cutefishos/sddm-theme
-        sudo mk-build-deps ./debian/control -i -t "apt-get --yes" -r
-        dpkg-buildpackage -b -uc -us
-        mkdir build
-        cd build
-        cmake ..
-        make
-        sudo make install
-        ;;
-        appmotor)
-        cd ~/cutefishos
-        git clone https://github.com/piscesys/appmotor.git
-        cd ~/cutefishos/appmotor
-        sudo mk-build-deps ./debian/control -i -t "apt-get --yes" -r
-        dpkg-buildpackage -b -uc -us
-        mkdir build
-        cd build
-        cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ..
-        make
-        sudo make install
-        ;;
-        wallpapers)
-        cd ~/cutefishos
-        git clone https://github.com/piscesys/wallpapers.git
-        cd ~/cutefishos/wallpapers
-        sudo mk-build-deps ./debian/control -i -t "apt-get --yes" -r
-        dpkg-buildpackage -b -uc -us
-        mkdir build
-        cd build
-        cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ..
-        make
-        sudo make install
-        ;;
-        calamares)
-        cd ~/cutefishos
-        git clone https://github.com/piscesys/calamares.git
-        cd ~/cutefishos/calamares
-        sudo mk-build-deps ./debian/control -i -t "apt-get --yes" -r
-        dpkg-buildpackage -b -uc -us
-        mkdir build
-        cd build
-        cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ..
-        make
-        sudo make install
-        ;;
-        quit)
-        exit 1
+        make)
+            standardBuild_make $1
         ;;
         *)
-        echo "输入错误, 请输入项目前序号或者输入27(quit)退出"
+            echo "Unknown ERROR"
+            exit 1
         ;;
     esac
 }
 
-select i in fishui libcutefish qt-plugins kwin-plugins core daemon filemanager dock screenshot terminal launcher settings debinstaller icons gtk-themes statusbar updator screenlocker calculator videoplayer sddm-theme appmotor wallpapers calamares texteditor all quit
+PAC_LIST="fishui libpisces qt-plugins kwin-plugins core daemon filemanager dock screenshot terminal launcher settings debinstaller icons gtk-themes statusbar updator screenlocker calculator videoplayer sddm-theme appmotor wallpapers calamares texteditor"
+
+function Selection()
+{
+    echo 'Input the number of the component you want to build and press enter (27 to quit)'
+    PS3='Input a number (ENTER to see the list):'
+    select i in $PAC_LIST ALL QUIT
+    do
+        if test "$i" == "ALL" ;
+        then
+            for j in $PAC_LIST
+            do
+                Build $j
+            done
+        elif test "$i" == "QUIT" ;
+        then
+            echo "Build script quitted."
+            exit 0
+        elif test "$i" != "" ;
+        then
+            Build $i
+        else
+        echo 'Invalid number. Please check your input.'
+        fi
+    done
+}
+
+echo 'In which way would you like to install?'
+select QUE in "apt - Build Debian packages and install with APT (Easy to remove)" "make install - Install the binaries directly"
 do
-   if test $i == all
-   then
-       for j in fishui libcutefish qt-plugins kwin-plugins core daemon filemanager dock screenshot terminal launcher settings debinstaller icons gtk-themes statusbar updator screenlocker calculator videoplayer sddm-theme appmotor wallpapers calamares texteditor
-       do
-          Compile $j
-        done
+    if test "$QUE" == "apt - Build Debian packages and install with APT (Easy to remove)"
+    then
+        WAY_TO_INSTALL="apt"
+        echo '------'
+        Selection
     else
-       Compile $i
+        if test "$QUE" == "make install - Install the binaries directly"
+        then
+            WAY_TO_INSTALL="make"
+            echo '------'
+            Selection
+        fi
     fi
 done
