@@ -93,13 +93,13 @@ function Build(){
 }
 
 # Package list here. Once new packages were added please add the repository name here.
-PAC_LIST="fishui libpisces qt-plugins kwin-plugins core daemon filemanager dock screenshot terminal launcher settings debinstaller icons gtk-themes statusbar updator screenlocker calculator videoplayer sddm-theme appmotor wallpapers calamares texteditor grub-theme plymouth-theme"
+PAC_LIST="fishui libpisces qt-plugins kwin-plugins core daemon filemanager dock screenshot terminal launcher settings debinstaller icons gtk-themes statusbar updator screenlocker calculator videoplayer sddm-theme appmotor wallpapers calamares texteditor cursor-themes grub-theme plymouth-theme"
 
 function Selection()
 {
-    echo 'Input the number of the component you want to build and press enter (27 to quit)'
+    echo 'Input the number of the component you want to build and press enter (1 for all, 2 to quit)'
     PS3='Input a number (ENTER to see the list):'
-    select i in $PAC_LIST ALL QUIT
+    select i in ALL QUIT $PAC_LIST
     do
         if test "$i" == "ALL" ;
         then
